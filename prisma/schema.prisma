@@ -1,0 +1,27 @@
+// Esquema de Prisma — Especialistas Salud
+// Documentación: https://pris.ly/d/prisma-schema
+//
+// Prisma 7 usa el generador "prisma-client": el cliente se genera en
+// src/generated/prisma (ignorado por git) y la URL de la base de datos
+// se configura en prisma.config.ts (lee DATABASE_URL desde .env).
+//
+// Los MODELOS todavía no están definidos. Definirlos es la primera tarea
+// del MVP (ver el issue "MVP 1: Esquema de datos — User, Specialty, Professional").
+// No copies modelos de internet: diséñalos a partir del modelo conceptual
+// acordado en docs/arquitectura.md y entiende cada relación antes de escribirla.
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// --- Modelos del MVP (a implementar por el equipo) ---
+// enum Role { ADMIN PROFESSIONAL }
+// model User { ... }
+// model Specialty { ... }
+// model Professional { ... }
+// ...

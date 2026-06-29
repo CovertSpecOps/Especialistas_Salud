@@ -1,0 +1,11 @@
+{
+  "app": {
+    "name": "Especialistas Salud",
+    "tagline": "CRM para profesionales de la salud"
+  },
+  "home": {
+    "title": "Especialistas Salud",
+    "subtitle": "Sistema de gestión clínica para cualquier especialidad.",
+    "status": "Proyecto en construcción — MVP en desarrollo."
+  }
+}
