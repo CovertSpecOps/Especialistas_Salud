@@ -1,5 +1,7 @@
 # Especialistas Salud
 
+[![CI](https://github.com/CovertSpecOps/Especialistas_Salud/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/CovertSpecOps/Especialistas_Salud/actions/workflows/ci.yml)
+
 CRM web para **profesionales de la salud** de cualquier disciplina (fisioterapia,
 nutrición, odontología, medicina general, psicología, etc.). Pensado para clínicas
 en Costa Rica donde **varios profesionales comparten una misma instancia**.

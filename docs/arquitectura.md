@@ -102,3 +102,18 @@ de implementarlas:
 4. MVP 4 — `ClinicalNote` + plantillas seleccionables (requiere cerrar la decisión 1).
 5. MVP 5 — `Attachment` + línea de tiempo del paciente.
 6. Autenticación y roles (puede adelantarse; requiere cerrar la decisión 2).
+
+## Infraestructura: CI sin CD (decisión 2026-07-10)
+
+- **CI en GitHub Actions** (repo público → gratis). Workflow `CI` (job `calidad`):
+  `prisma generate` + las cuatro puertas. Workflow `PR` (job `dod`): exige la sección
+  "Definición de Hecho" completa en la descripción del PR, con un script bash+jq propio
+  (sin acciones de terceros). Protección de `main`: ambos checks + 1 aprobación con
+  code owners; administradores exentos mientras el repo tenga una sola cuenta.
+- **Sin CD ni nube, a propósito.** El desarrollo usa Postgres local (Docker) y no hay
+  hosting. Cuando exista algo que valga la pena desplegar se decidirá el proveedor
+  (candidatos: Vercel + Neon/Supabase/Prisma Postgres).
+- **Mejora futura del CI:** contenedor de servicio Postgres + `prisma migrate deploy`
+  (+ seed de humo) cuando MVP 1 introduzca el esquema y las migraciones.
+
+Detalle completo: [`docs/superpowers/specs/2026-07-10-ci-pipeline-design.md`](./superpowers/specs/2026-07-10-ci-pipeline-design.md).
