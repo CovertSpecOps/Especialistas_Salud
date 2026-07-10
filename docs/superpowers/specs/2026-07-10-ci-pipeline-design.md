@@ -1,7 +1,7 @@
 # Diseño — Pipeline de CI, DoD y protección de rama
 
 - **Fecha:** 2026-07-10
-- **Estado:** aprobado (pendiente de implementación)
+- **Estado:** implementado (PR #12)
 - **Alcance:** solo CI + reglas de PR. **Sin CD ni nube por ahora** (decisión explícita).
 
 ## Contexto y objetivo

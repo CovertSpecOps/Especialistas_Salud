@@ -31,7 +31,7 @@ escribir mucho código.
    ```
 4. **Pasa las puertas de calidad** (deben quedar en verde):
    ```bash
-   npm run lint && npm run typecheck && npm run test && npm run build
+   npm run db:generate && npm run lint && npm run typecheck && npm run test && npm run build
    ```
 5. **Sube la rama y abre el PR:**
    ```bash
@@ -58,6 +58,9 @@ Cada PR ejecuta automáticamente dos checks en GitHub Actions:
   **"Definición de Hecho"** de la plantilla con **todos** los checkboxes marcados
   (marcar un ítem condicional significa "hecho o no aplica"). Si editas la descripción,
   el check se re-ejecuta solo.
+- Caso raro: si un PR se abrió contra otra rama y luego se retargetea a `main`, el check
+  `calidad` puede quedarse en "expected" sin ejecutarse; se resuelve con cualquier push
+  nuevo o cerrando y reabriendo el PR.
 
 La rama `main` está protegida: exige ambos checks en verde y **1 aprobación** (con
 revisión de code owner — ver `.github/CODEOWNERS`). Los administradores están exentos

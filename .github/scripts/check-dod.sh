@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Verifica la "Definición de Hecho" (DoD) en la descripción de un PR:
 #   1. Debe existir la sección "## Definición de Hecho".
-#   2. No puede quedar ningún checkbox sin marcar ("- [ ]" o "* [ ]").
+#   2. No puede quedar ningún checkbox sin marcar ("- [ ]", "* [ ]", "+ [ ]" o "1. [ ]").
 #
 # Uso: check-dod.sh <ruta-al-evento-json>   (en CI: "$GITHUB_EVENT_PATH")
 #
@@ -18,7 +18,7 @@ if ! grep -qF '## Definición de Hecho' <<<"$BODY"; then
   exit 1
 fi
 
-PENDIENTES="$(grep -cE '^[[:space:]]*[-*] \[ \]' <<<"$BODY" || true)"
+PENDIENTES="$(grep -cE '^[[:space:]]*([-*+]|[0-9]+[.)]) \[ \]' <<<"$BODY" || true)"
 if [ "$PENDIENTES" -gt 0 ]; then
   echo "::error::Quedan $PENDIENTES checkbox(es) sin marcar en la descripción del PR. Marca cada ítem (marcar también significa 'no aplica')."
   exit 1

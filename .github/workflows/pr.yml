@@ -4,6 +4,9 @@
 # Diseño: docs/superpowers/specs/2026-07-10-ci-pipeline-design.md
 name: PR
 
+permissions:
+  contents: read
+
 on:
   pull_request:
     types: [opened, edited, synchronize, reopened]
