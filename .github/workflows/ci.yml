@@ -1,0 +1,42 @@
+# CI — puertas de calidad de CLAUDE.md, en el mismo orden que se exigen
+# en local: lint → typecheck → test → build.
+#
+# Sin base de datos: `prisma generate` no se conecta a ninguna BD, pero
+# prisma.config.ts lee DATABASE_URL al cargar, así que se define un
+# placeholder sintácticamente válido.
+#
+# Diseño: docs/superpowers/specs/2026-07-10-ci-pipeline-design.md
+name: CI
+
+permissions:
+  contents: read
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+# Cancela ejecuciones obsoletas de la misma rama en PRs (ahorra minutos);
+# en `main` no se cancela para no perder la verificación de ningún merge.
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  calidad:
+    runs-on: ubuntu-latest
+    env:
+      DATABASE_URL: "postgresql://placeholder:placeholder@localhost:5432/placeholder"
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - run: npm run db:generate
+      - run: npm run lint
+      - run: npm run typecheck
+      - run: npm run test
+      - run: npm run build

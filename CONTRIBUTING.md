@@ -31,7 +31,7 @@ escribir mucho código.
    ```
 4. **Pasa las puertas de calidad** (deben quedar en verde):
    ```bash
-   npm run lint && npm run typecheck && npm run test && npm run build
+   npm run db:generate && npm run lint && npm run typecheck && npm run test && npm run build
    ```
 5. **Sube la rama y abre el PR:**
    ```bash
@@ -39,13 +39,54 @@ escribir mucho código.
    ```
    Abre el Pull Request en GitHub, rellena la plantilla y **avisa a Aaron** para que lo
    revise. Responde a sus comentarios en la misma rama (nuevos commits actualizan el PR).
-6. **Merge** solo cuando Aaron apruebe. Después borra la rama.
+6. **Merge** solo cuando Aaron apruebe **y los checks del CI (`calidad` y `dod`) estén en
+   verde**. Después borra la rama.
 
 ## Tamaño de los PRs
 
 Pequeños y enfocados: una responsabilidad por PR. Es preferible una serie de PRs chicos
 que se revisan rápido a uno enorme. Si un PR empieza a tocar muchas cosas distintas,
 pártelo.
+
+## CI y protección de `main`
+
+Cada PR ejecuta automáticamente dos checks en GitHub Actions:
+
+- **`calidad`** (`.github/workflows/ci.yml`): `prisma generate` + las cuatro puertas en
+  el orden de siempre — `lint`, `typecheck`, `test`, `build`.
+- **`dod`** (`.github/workflows/pr.yml`): la descripción del PR debe conservar la sección
+  **"Definición de Hecho"** de la plantilla con **todos** los checkboxes marcados
+  (marcar un ítem condicional significa "hecho o no aplica"). Si editas la descripción,
+  el check se re-ejecuta solo.
+- Caso raro: si un PR se abrió contra otra rama y luego se retargetea a `main`, el check
+  `calidad` puede quedarse en "expected" sin ejecutarse; se resuelve con cualquier push
+  nuevo o cerrando y reabriendo el PR.
+
+La rama `main` está protegida: exige ambos checks en verde y **1 aprobación** (con
+revisión de code owner — ver `.github/CODEOWNERS`). Los administradores están exentos
+mientras el repositorio tenga una sola cuenta, porque GitHub no permite aprobar un PR
+propio. La protección se aplicó con este comando (reproducible si hay que recrearla):
+
+```bash
+gh api --method PUT -H "Accept: application/vnd.github+json" \
+  repos/CovertSpecOps/Especialistas_Salud/branches/main/protection \
+  --input - <<'JSON'
+{
+  "required_status_checks": {
+    "strict": false,
+    "checks": [{ "context": "calidad" }, { "context": "dod" }]
+  },
+  "enforce_admins": false,
+  "required_pull_request_reviews": {
+    "require_code_owner_reviews": true,
+    "required_approving_review_count": 1
+  },
+  "restrictions": null,
+  "allow_force_pushes": false,
+  "allow_deletions": false
+}
+JSON
+```
 
 ## Qué NO hacer
 
