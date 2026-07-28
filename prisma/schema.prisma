@@ -5,10 +5,12 @@
 // src/generated/prisma (ignorado por git) y la URL de la base de datos
 // se configura en prisma.config.ts (lee DATABASE_URL desde .env).
 //
-// Los MODELOS todavía no están definidos. Definirlos es la primera tarea
-// del MVP (ver el issue "MVP 1: Esquema de datos — User, Specialty, Professional").
-// No copies modelos de internet: diséñalos a partir del modelo conceptual
-// acordado en docs/arquitectura.md y entiende cada relación antes de escribirla.
+// Modelo conceptual y decisiones de diseño: docs/arquitectura.md
+// Principios aplicados aquí:
+//   - Especialidad = dato, no comportamiento.
+//   - Soft delete (active/activo/activa): nunca se borran filas.
+//   - IDs (cuid) para relacionar; nombres solo para mostrar.
+//   - Timestamps de auditoría en todas las entidades.
 
 generator client {
   provider = "prisma-client"
@@ -19,9 +21,59 @@ datasource db {
   provider = "postgresql"
 }
 
-// --- Modelos del MVP (a implementar por el equipo) ---
-// enum Role { ADMIN PROFESSIONAL }
-// model User { ... }
-// model Specialty { ... }
-// model Professional { ... }
-// ...
+// --- Roles del sistema ---
+// No hay tabla Role: en el MVP un enum es suficiente (ver arquitectura.md).
+enum Role {
+  ADMIN
+  PROFESSIONAL
+}
+
+// --- User: autenticación ---
+// Responsabilidad única: identificar y autenticar. Los datos "de persona"
+// (nombre, teléfono, etc.) viven en Professional, no aquí.
+model User {
+  id           String   @id @default(cuid())
+  email        String   @unique // solo para login; único en la base
+  passwordHash String // SIEMPRE hasheada, nunca texto plano
+  role         Role     @default(PROFESSIONAL)
+  active       Boolean  @default(true) // soft delete
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  // Relación 1:1 con Professional. Opcional en el lado User porque un
+  // usuario puede existir (p. ej. un ADMIN) sin perfil de profesional.
+  professional Professional?
+}
+
+// --- Specialty: catálogo de especialidades ---
+// Un admin puede ampliar la lista. La especialidad es un DATO configurable.
+model Specialty {
+  id          String   @id @default(cuid())
+  nombre      String   @unique // sin duplicados
+  descripcion String? // opcional
+  activa      Boolean  @default(true) // soft delete
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // 1:N — una especialidad la comparten varios profesionales.
+  profesionales Professional[]
+}
+
+// --- Professional: perfil del profesional ---
+// Describe a la persona que atiende. Se relaciona con User (login) y con
+// Specialty (su disciplina) por ID.
+model Professional {
+  id             String   @id @default(cuid())
+  userId         String   @unique // @unique => fuerza el 1:1 con User
+  specialtyId    String
+  nombre         String
+  apellidos      String
+  correoContacto String? // correo de contacto público, distinto al de login
+  telefono       String?
+  activo         Boolean  @default(true) // soft delete
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  user      User      @relation(fields: [userId], references: [id])
+  specialty Specialty @relation(fields: [specialtyId], references: [id])
+}
