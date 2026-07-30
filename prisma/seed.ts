@@ -14,9 +14,15 @@ import { scryptSync, randomBytes } from "node:crypto";
 import { PrismaPg } from "@prisma/adapter-pg";
 import { PrismaClient } from "../src/generated/prisma/client";
 
+// Validamos DATABASE_URL antes de conectar. Si falta, el driver de Postgres no
+// falla: se conectaria a localhost:5432 con el usuario del sistema, o sea que
+// el seed podria escribir en la base equivocada. Mejor fallar de inmediato.
+const url = process.env.DATABASE_URL;
+if (!url) throw new Error("Falta DATABASE_URL. Copia .env.example a .env.");
+
 // Prisma 7 conecta mediante un "driver adapter" (ya no un motor binario):
 // hay que pasarle explicitamente uno. PrismaPg usa la DATABASE_URL.
-const adapter = new PrismaPg({ connectionString: process.env.DATABASE_URL });
+const adapter = new PrismaPg({ connectionString: url });
 const prisma = new PrismaClient({ adapter });
 
 // Hash de contrasena con scrypt (integrado en Node, sin dependencias nuevas).

@@ -76,4 +76,9 @@ model Professional {
 
   user      User      @relation(fields: [userId], references: [id])
   specialty Specialty @relation(fields: [specialtyId], references: [id])
+
+  // Índice para "listar profesionales por especialidad" (consulta típica del
+  // MVP). PostgreSQL no indexa las claves foráneas automáticamente, así que
+  // hay que declararlo a mano.
+  @@index([specialtyId])
 }
